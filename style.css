@@ -1,0 +1,74 @@
+:root{
+  --bg:#f3efe6; --panel:#ffffff; --muted:#6c7a66;
+  --accent:#6aa27a; --accent-2:#a3d39c; --tile:#bfae97;
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial;
+}
+html,body{ height:100%; margin:0; background:var(--bg); color:#153625; }
+.wrap{ max-width:1200px; margin:12px auto; padding:0 12px; }
+
+/* Overlay modal */
+.overlay{ position:fixed; left:0; top:0; right:0; bottom:0; display:flex; align-items:center; justify-content:center; background:rgba(15,20,10,0.15); z-index:200; pointer-events:auto; }
+.modal{ width:760px; max-width:96%; padding:18px; border-radius:12px; background:var(--panel); box-shadow:0 12px 40px rgba(30,40,30,0.08); border:1px solid rgba(20,30,20,0.04); color:#153625; }
+.modal.small{ width:520px; }
+
+/* Stage layout */
+#stage{ display:flex; gap:14px; margin-top:8px; align-items:flex-start; transition:filter 0.28s ease, opacity 0.28s ease; pointer-events:auto; }
+#left-area{ flex:1; }
+#right-area{ width:350px; }
+
+/* Blurred state before game start */
+#stage.blurred{ filter: blur(6px) grayscale(0.04) brightness(0.84); pointer-events:none; user-select:none; opacity:0.95; }
+
+/* Canvas container */
+#canvas-container{ width:792px; height:648px; border-radius:10px; background:linear-gradient(180deg,#eaf3ea,#e1efe0); box-shadow: inset 0 0 0 1px rgba(0,0,0,0.02); overflow:hidden; }
+
+/* Panels & controls */
+.panel{ padding:12px; background:transparent; border-radius:10px; }
+.header-row{ display:flex; justify-content:space-between; align-items:center; }
+.controls-row button{ margin-left:8px; }
+
+/* Status grid */
+.status-grid{ display:flex; gap:8px; margin-top:12px; }
+.status-grid > div{ flex:1; background:#f7f9f6; padding:10px; border-radius:8px; text-align:center; border:1px solid rgba(20,30,20,0.03);}
+.big{ font-weight:800; color:var(--accent); margin-top:6px }
+
+/* Legend */
+.legend{ margin-top:8px; display:grid; grid-template-columns:1fr 1fr; gap:6px; font-size:13px; color:var(--muted); }
+.legend-row{ display:flex; align-items:center; gap:8px; }
+.tile{ width:22px; height:16px; display:inline-block; border-radius:4px; border:1px solid rgba(0,0,0,0.05); }
+.tile.sun{ background:#f6d6a8; }
+.tile.dry{ background:#e2d0bb; }
+.tile.dew{ background:#bfeeff; }
+.tile.shade{ background:#7aa47f; }
+.tile.goalA{ background:#c9efd6; }
+.tile.goalB{ background:#a6e6c0; }
+
+/* Buttons */
+.btn{ background:transparent; padding:8px 12px; border-radius:8px; border:1px solid rgba(20,30,20,0.04); color:#153625; cursor:pointer; }
+.btn.primary{ background:linear-gradient(180deg,var(--accent-2),var(--accent)); border:none; color:#08331a; font-weight:700; }
+
+/* Onboard content */
+.lead{ color:#345941; margin-top:6px; }
+.slide-area{ margin-top:12px; min-height:90px; display:flex; align-items:flex-start; gap:12px; }
+.slide{ width:100%; }
+.onboard-controls{ display:flex; justify-content:space-between; align-items:center; margin-top:12px; }
+.name-choose{ display:flex; gap:12px; }
+.panel.small{ padding:12px; width:50%; background:#fbfdf9; border-radius:8px; border:1px solid rgba(20,30,20,0.03); }
+
+/* loading split */
+.loading-split{ display:flex; gap:12px; }
+.role-box{ flex:1; background:#fbfdf9; padding:10px; border-radius:8px; border:1px solid rgba(20,30,20,0.03); }
+.progress-wrap{ width:100%; margin-top:12px; }
+.progress{ width:100%; height:12px; background:#f0f5ef; border-radius:8px; overflow:hidden; border:1px solid rgba(20,30,20,0.03); }
+#loading-fill{ height:100%; background:linear-gradient(90deg,#c9efd6,#84c98f); width:0%; transition:width 0.2s linear; }
+
+/* small modal text/labels */
+.small .modal p{ margin:6px 0; }
+.hint{ padding:8px; background:#fbfdf9; border-radius:8px; color:#345941; border:1px solid rgba(20,30,20,0.03); }
+
+/* responsive */
+@media (max-width: 1100px){
+  #stage{ flex-direction:column; }
+  #right-area{ width:100%; }
+  #canvas-container{ width:100%; height:520px; }
+}

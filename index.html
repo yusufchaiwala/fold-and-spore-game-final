@@ -1,0 +1,181 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Fold & Spore</title>
+  <link rel="stylesheet" href="style.css" />
+  <!-- p5.js + p5.sound (optional) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.6.0/p5.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.6.0/addons/p5.sound.min.js"></script>
+</head>
+<body>
+  <!-- paste the HTML you already had (onboard, stage, popups) -->
+  <!-- I include the same HTML you shared earlier to keep markup consistent -->
+  <div class="wrap">
+    <div id="onboard-modal" class="overlay" aria-hidden="false">
+      <div class="modal" role="dialog" aria-modal="true" aria-labelledby="onboard-title">
+        <div id="onboard-step-1" class="onboard-step">
+          <h1 id="onboard-title">Fold & Spore</h1>
+          <p class="lead">A cooperative two-player nature puzzle. Work together — Mimosa folds, Moss collects dew.</p>
+          <div class="slide-area">
+            <div id="slide-0" class="slide">
+              <h3>Controls</h3>
+              <p><strong>Mimosa</strong>: WASD to move, SPACE to fold shade. <strong>Moss</strong>: Arrow keys to move, M to moisten/activate.</p>
+            </div>
+            <div id="slide-1" class="slide" style="display:none;">
+              <h3>Goals</h3>
+              <p>Mimosa: create <strong id="req-shade">5</strong> shades before reaching your gate.<br/>Moss: collect all dew drops and moisten tiles.</p>
+            </div>
+            <div id="slide-2" class="slide" style="display:none;">
+              <h3>Tips</h3>
+              <p>Switches (T / L) unlock the opposite gates. You must cooperate — there is no single-player path to victory.</p>
+            </div>
+          </div>
+
+          <div class="onboard-controls">
+            <div>
+              <button id="onboard-prev" class="btn">Prev</button>
+              <button id="onboard-next" class="btn primary">Next</button>
+            </div>
+            <div>
+              <button id="onboard-skip" class="btn">Skip</button>
+              <button id="onboard-start" class="btn primary">Choose Names</button>
+            </div>
+          </div>
+        </div>
+
+        <div id="onboard-step-2" class="onboard-step" style="display:none;">
+          <h2>Pick Nicknames</h2>
+          <div class="name-choose">
+            <div class="panel small">
+              <label for="input-mimosa"><strong>Mimosa</strong></label>
+              <input id="input-mimosa" placeholder="e.g. Yusuf" />
+            </div>
+            <div class="panel small">
+              <label for="input-moss"><strong>Moss</strong></label>
+              <input id="input-moss" placeholder="e.g. Zarqa" />
+            </div>
+          </div>
+          <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:12px;">
+            <button id="name-back" class="btn">Back</button>
+            <button id="name-next" class="btn primary">Start Loading</button>
+          </div>
+        </div>
+
+        <div id="onboard-step-3" class="onboard-step" style="display:none;">
+          <h2>Preparing</h2>
+          <div class="loading-split">
+            <div class="role-box">
+              <h3 id="role-mimosa-name">Mimosa</h3>
+              <p>Create shade by folding. Shade protects from sun and counts to Mimosa's goal.</p>
+            </div>
+            <div class="role-box">
+              <h3 id="role-moss-name">Moss</h3>
+              <p>Collect dew drops to increase moisture; use moisture to moisten dry tiles or activate switch T.</p>
+            </div>
+          </div>
+
+          <div class="progress-wrap">
+            <div id="loading-bar" class="progress"><div id="loading-fill" style="width:0%"></div></div>
+            <div style="display:flex; justify-content:space-between; margin-top:8px;">
+              <small id="loading-timer">15s</small>
+              <div>
+                <button id="loading-skip" class="btn">Skip</button>
+                <button id="loading-start" class="btn primary">Play Now</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div id="stage" class="blurred">
+      <div id="left-area">
+        <div id="canvas-container"></div>
+      </div>
+
+      <div id="right-area">
+        <div class="panel">
+          <div class="header-row">
+            <div>
+              <div style="font-weight:800; font-size:16px;">
+                <span id="label-mimosa">Mimosa</span>
+              </div>
+              <div style="font-size:13px; color:var(--muted);">Role: fold</div>
+            </div>
+            <div class="controls-row">
+              <button id="btn-pause" class="btn">Pause</button>
+              <button id="btn-restart" class="btn">Restart</button>
+              <button id="btn-tutorial" class="btn">Tutorial</button>
+              <button id="btn-home" class="btn">Home</button>
+            </div>
+          </div>
+
+          <div class="status-grid">
+            <div><small>Shade</small><div id="shade-count" class="big">0 / 5</div></div>
+            <div><small>Dew</small><div id="dew-count" class="big">0</div></div>
+            <div><small>Timer</small><div id="hud-timer" class="big">02:00</div></div>
+          </div>
+
+          <hr />
+
+          <div id="legend" class="legend">
+            <div class="legend-row"><span class="tile sun"></span> Sun (danger)</div>
+            <div class="legend-row"><span class="tile dry"></span> Dry (needs moisture)</div>
+            <div class="legend-row"><span class="tile dew"></span> Dew (collect)</div>
+            <div class="legend-row"><span class="tile shade"></span> Shade (fold)</div>
+            <div class="legend-row"><span class="tile goalA"></span> Gate A (<span id="gateA-name">A</span>)</div>
+            <div class="legend-row"><span class="tile goalB"></span> Gate B (<span id="gateB-name">B</span>)</div>
+            <div class="legend-row" style="grid-column:1/3; font-size:13px; color:var(--muted);">
+              Switch labels: T opens Gate A, L opens Gate B
+            </div>
+          </div>
+        </div>
+
+        <div class="panel" style="margin-top:12px;">
+          <div id="hint" class="hint">Hint: Talk to your teammate — open each other's gates.</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="popup-goal" class="overlay" style="display:none">
+      <div class="modal small">
+        <h3 id="popup-goal-title">You cannot finish yet</h3>
+        <pre id="popup-goal-body"></pre>
+        <div style="text-align:right; margin-top:10px;">
+          <button id="popup-goal-close" class="btn primary">OK</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="popup-end" class="overlay" style="display:none">
+      <div class="modal small">
+        <h2 id="end-title"></h2>
+        <p id="end-body"></p>
+        <div style="display:flex; justify-content:flex-end; gap:10px;">
+          <button id="end-home" class="btn">Home</button>
+          <button id="end-next" class="btn primary">Next Level</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="popup-info" class="overlay" style="display:none">
+      <div class="modal small">
+        <p id="popup-info-body"></p>
+        <div style="text-align:right; margin-top:8px;">
+          <button id="popup-info-close" class="btn primary">OK</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- local uploaded file reference (provided) -->
+  <div style="display:none">
+    Uploaded file path: <code>sandbox:/mnt/data/Untitled document.txt</code>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
